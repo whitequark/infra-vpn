@@ -1,0 +1,42 @@
+---
+- name: install wireguard
+  apt:
+    pkg:
+      - linux-headers-cloud-amd64
+      - wireguard
+  register: wireguard_install
+- name: load wireguard module
+  modprobe: name=wireguard
+  when: wireguard_install.changed
+- name: generate wireguard privkey
+  shell: umask 077 && wg genkey >/etc/wireguard/{{ wireguard_iface }}-privkey
+  args:
+    creates: /etc/wireguard/{{ wireguard_iface }}-privkey
+  register: genkey
+- name: generate wireguard pubkey
+  shell: wg pubkey </etc/wireguard/{{ wireguard_iface }}-privkey >/etc/wireguard/{{ wireguard_iface }}-pubkey
+  args:
+    creates: /etc/wireguard/{{ wireguard_iface }}-pubkey
+- name: retrieve wireguard pubkey
+  slurp:
+    src: /etc/wireguard/{{wireguard_iface}}-pubkey
+  become: true
+  register: wireguard_pubkey_data
+  ignore_errors: true
+  when: wireguard[wireguard_iface] is not defined
+- name: set wireguard facts
+  set_fact:
+    wireguard: "{'{{wireguard_iface}}': {'port': {{ wireguard_port }}, 'pubkey':'{{ wireguard_pubkey_data.content | b64decode | trim }}'} }"
+    cacheable: true
+  when: wireguard[wireguard_iface] is not defined and not wireguard_pubkey_data.failed
+- name: configure wireguard
+  template: dest=/etc/wireguard/{{ wireguard_iface }}.conf src=wireguard.conf
+  notify:
+    - restart wireguard
+- name: enable /etc/network/interfaces.d
+  lineinfile: dest=/etc/network/interfaces regexp=interfaces.d
+    line="source /etc/network/interfaces.d/*"
+- name: configure wireguard interface
+  template: dest=/etc/network/interfaces.d/{{ wireguard_iface }}.cfg src=ifupdown.cfg
+  notify:
+    - restart wireguard

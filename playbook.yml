@@ -1,0 +1,26 @@
+---
+- hosts: vpn
+  remote_user: root
+  become_method: su
+  vars_files:
+    - wireguard.yml
+  pre_tasks:
+    - include: tasks/apt.yml
+      tags: apt
+    - include: tasks/sysctl.yml
+      tags: sysctl
+  roles:
+    - role: wireguard
+      vars:
+        wireguard_forward: true
+      tags: wireguard
+  post_tasks:
+    - name: create configuration directories
+      local_action: file path=configs/{{ item }} state=directory
+      loop: '{{ wireguard_peers.keys() | list }}'
+      tags: wireguard, config
+    - name: write wireguard configurations
+      local_action: template dest=configs/{{ item }}/wg-{{ ansible_hostname }}.conf
+        src=configs/template.conf
+      loop: '{{ wireguard_peers.keys() | list }}'
+      tags: wireguard, config

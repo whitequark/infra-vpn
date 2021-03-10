@@ -1,0 +1,4 @@
+/.cache
+/hosts.cfg
+/wireguard.yml
+/configs/*/

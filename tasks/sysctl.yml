@@ -1,0 +1,8 @@
+---
+- name: enable IP forwarding
+  lineinfile: dest=/etc/sysctl.conf regexp="net\.ipv4\.ip_forward="
+    line="net.ipv4.ip_forward=1"
+  register: sysctl_conf
+- name: apply sysctl settings
+  shell: sysctl -p
+  when: sysctl_conf.changed

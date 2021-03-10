@@ -1,0 +1,6 @@
+---
+wireguard_iface: "wg0"
+wireguard_host: 10.0.0.1/24
+wireguard_port: 10000
+wireguard_peers: {}
+wireguard_forward: false

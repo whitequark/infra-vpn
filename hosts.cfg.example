@@ -1,0 +1,2 @@
+[vpn]
+vpn-01 ansible_host=42.0.0.1 wireguard_port=12345
