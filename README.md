@@ -9,7 +9,7 @@ Provision any number of machines based on Debian 10 and create/update `hosts.cfg
 vpn-01 ansible_host=42.0.0.1
 ```
 
-It is possible to customize the WireGuard listening port per machine:
+The default WireGuard listening port is `10000`. It is possible to customize the port per machine:
 
 ```ini
 [vpn]
