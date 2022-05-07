@@ -1,11 +1,6 @@
 ---
-- name: add unstable APT sources
-  copy: dest=/etc/apt/sources.list.d/unstable.list src=templates/etc/apt/sources.list.d/unstable.list
-  register: apt_sources
-- name: pin unstable APT sources to low priority
-  copy: dest=/etc/apt/preferences.d/pin-unstable.pref src=templates/etc/apt/preferences.d/pin-unstable.pref
 - name: update APT cache and upgrade
-  apt: update_cache=yes upgrade=dist cache_valid_time={{ '0' if apt_sources.changed else '3600' }}
+  apt: update_cache=yes upgrade=dist cache_valid_time=3600
   register: apt_upgrade
 - name: reboot after upgrade
   reboot:

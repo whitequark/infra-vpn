@@ -2,7 +2,7 @@
 
 ## Setting up VPN servers
 
-Provision any number of machines based on Debian 10 and create/update `hosts.cfg`, e.g.:
+Provision any number of machines based on Debian 11 and create/update `hosts.cfg`, e.g.:
 
 ```ini
 [vpn]
